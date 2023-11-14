@@ -20,29 +20,62 @@
             color: #333;
             margin-bottom: 10px;
         }
+
+
+
+
+h1 {
+    font-size: 32px; /* Makes the font size of h1 elements larger */
+    margin: 20px 0; /* Adds more margin around h1 elements */
+}
+
+.navbar-expand-lg .navbar-nav {
+    flex-direction: row; /* Aligns navbar items in a row */
+}
+
+.nav-item {
+    display: flex; /* Makes each nav-item a flex container */
+    align-items: center; /* Aligns items vertically in the center */
+    margin-right: 50px; /* Adds space to the right of each nav-item */
+    font-size: 1.5em; /* Sets the font size similar to h2 elements */
+}
+
+.navbar-toggler {
+    margin-left: auto; /* Pushes the toggle to the end of the navbar */
+}
+
+
+.navbar-text {
+    display: flex; /* Makes the navbar-text a flex container */
+    align-items: center; /* Aligns the text vertically in the center */
+}
     </style>
+
+
 </head>
 <body>
-    <div class="banner">
-        <h1 class="text-center mt-2 mb-4">Volunteer Today!</h1>
-        <img class="img-fluid" src="banner-sample.webp" height="320" alt="Banner Image">
-    </div>
+<div class="banner">
+    <h1 class="text-center mt-2 mb-4">Volunteer Today!</h1>
+    <img class="img-fluid" src="banner-sample.webp" height="320" alt="Banner Image">
+</div>
+{% include 'nav.html' %}
 
-    <h2>Amazing Experiences!</h2>
-    <p class="lead">Find fulfillment today! Volunteer for a cause you care about!</p>
 
-    <h2 class="text-center mt-2 mb-4">Available {{ company }} Positions</h2>
+<h2>Amazing Experiences!</h2>
+<p class="lead">Find fulfillment today! Volunteer for a cause you care about!</p>
 
-    <div class="container">
-        <!-- Job Listings -->
-        {% for job in jobs %}
-           {%include 'jobitems.html' %}
-        {% endfor %}
+<h2 class="text-center mt-2 mb-4">Available {{ company }} Positions</h2>
 
-    </div>
+<div class="container">
+    <!-- Job Listings -->
+    {% for job in jobs %}
+    {%include 'jobitems.html' %}
+    {% endfor %}
 
-    <div class="container">
-        <!-- Other content goes here -->
-    </div>
+</div>
+
+<div class="container">
+    <!-- Other content goes here -->
+</div>
 </body>
 </html>
