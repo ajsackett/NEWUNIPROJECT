@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Volunteer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu"
+          crossorigin="anonymous">
+    <style>
+        .banner {
+            background-color: #007bff;
+            color: #FFFFFF;
+            font-size: 24px;
+        }
+        .job-title, .job-title-h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1 class="text-center mt-2 mb-4">Volunteer Today!</h1>
+        <img class="img-fluid" src="banner-sample.webp" height="320" alt="Banner Image">
+    </div>
+
+    <h2>Amazing Experiences!</h2>
+    <p class="lead">Find fulfillment today! Volunteer for a cause you care about!</p>
+
+    <h2 class="text-center mt-2 mb-4">Available {{ company }} Positions</h2>
+
+    <div class="container">
+        <!-- Job Listings -->
+        {% for job in jobs %}
+           {%include 'jobitems.html' %}
+        {% endfor %}
+
+    </div>
+
+    <div class="container">
+        <!-- Other content goes here -->
+    </div>
+</body>
+</html>
