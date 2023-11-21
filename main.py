@@ -1,48 +1,30 @@
 from flask import Flask, render_template, jsonify
-
+from database import engine
+from sqlalchemy import text
+from dotenv import load_dotenv
+import os
 app = Flask(__name__)
 
-JOBS = [
-    {
-        'id': 1,
-        'title': 'soup maker',
-        'description': 'This is a job description',
-        'spaces': 2,
-        'company': 'Charity',
-        'location': 'London',
-        'date': '12/12/2023'
-    },
-  {
-        'id': 1,
-        'title': 'Homeless helper',
-        'description': 'This is a job description',
-        'spaces': 2,
-        'company': 'Charity',
-        'location': 'Bmouth',
-        'date': ''
-
-    },
-  {
-        'id': 1,
-        'title': 'charity manager',
-        'description': 'This is a job description',
-        'spaces': 2,
-        'company': 'Charity',
-        'location': 'Brixton',
-        'date': '12/12/2023'
-    },
-]
 
 
-
+def load_jobs():
+    results_dict = []
+    with engine.connect() as conn:
+        result_all = conn.execute(text("SELECT * FROM job_listings")).fetchall()
+        for row in result_all:
+            row = row._asdict()
+            results_dict.append(row)
+    return results_dict
 
 @app.route('/')
 def main():
-    return render_template('home.html',jobs=JOBS, company='Charity')
+    jobs = load_jobs()
+    return render_template('home.html', jobs=jobs)
 
 @app.route('/api/jobs')
 def list_jobs():
-    return jsonify(JOBS)
+    jobs = load_jobs()
+    return jsonify(jobs)
 
 if __name__ == '__main__':
     print('This is the main program')
