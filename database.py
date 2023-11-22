@@ -2,6 +2,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
+
 def configure():
     load_dotenv()
 
@@ -28,6 +29,8 @@ engine = create_engine(
 
 
 
+
 #first_result_2dict = first_result._asdict()
 #print(first_result_2dict)
 #print(type(first_result_2dict))
+
