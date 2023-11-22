@@ -13,9 +13,9 @@ def configure():
 
 configure()
 
-url = os.getenv('db_connection_url')
+#url = os.getenv('db_connection_url')
 
-
+url = db_connection_url
 
 engine = create_engine(
     url =url,
