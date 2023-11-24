@@ -1,36 +1,27 @@
-import sqlalchemy
 from sqlalchemy import create_engine
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
 def configure():
     load_dotenv()
 
 configure()
 
-def configure():
-    load_dotenv()
+url = os.getenv('db_connection_url')
 
-configure()
-
-#url = os.getenv('db_connection_url')
-
-url = db_connection_url
-
-engine = create_engine(
-    url =url,
-    connect_args={
-        'ssl': {
-            'ssl_ca': '/etc/ssl/cert.pem'
+def create_db_engine():
+    engine = create_engine(
+        url=url,
+        connect_args={
+            'ssl': {
+                'ca': r'C:/Users/t600d/Downloads/cacert.pem' # Use 'r' for raw string
+                # Add other SSL options if needed, such as 'cert' and 'key'
+            }
         }
-    }
+    )
+    return engine
 
-)
+engine = create_db_engine()
 
 
-
-
-#first_result_2dict = first_result._asdict()
-#print(first_result_2dict)
-#print(type(first_result_2dict))
 

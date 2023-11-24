@@ -27,7 +27,8 @@
 
 
     <div class="col-3">
-        <button class="btn btn-primary btn-lg" type="button" onclick="alert('You have applied for this job!')">Apply
-        </button>
+         <a href="{{ url_for('job_detail', id=job.id) }}" class="btn btn-primary">Apply</a>
     </div>
 </div>
+
+
