@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Add your CSS and other header content here -->
+
+    <!-- Link to Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Admin Dashboard</h1>
+
+        <!-- Logout Button -->
+        <form method="GET" action="/admin/logout">
+            <input type="submit" value="Logout" class="btn btn-danger mt-3">
+        </form>
+
+        <!-- Form for Adding a Job -->
+        <h2 class="mt-4">Add a Job</h2>
+        <form method="POST" action="/admin/dashboard">
+            <input type="hidden" name="action" value="add">  <!-- Action identifier -->
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea name="description" id="description" required class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="spaces">Spaces:</label>
+                <input type="number" name="spaces" id="spaces" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" name="location" id="location" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="company">Company:</label>
+                <input type="text" name="company" id="company" required class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" name="date" id="date" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add Job" class="btn btn-primary">
+            </div>
+        </form>
+
+        <!-- Form for Removing a Job by Title -->
+        <h2 class="mt-4">Remove a Job</h2>
+        <form method="POST" action="/admin/dashboard">
+            <input type="hidden" name="action" value="remove">  <!-- Action identifier -->
+            <div class="form-group">
+                <label for="title_to_remove">Title to Remove:</label>
+                <input type="text" name="title_to_remove" id="title_to_remove" required class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Remove Job" class="btn btn-danger">
+            </div>
+        </form>
+
+        <!-- Display List of Jobs (you can loop through jobs and display them here) -->
+        <h2 class="mt-4">List of Jobs</h2>
+        <ul class="list-group">
+            {% for job in jobs %}
+                <li class="list-group-item">
+                    <p class="mb-0">Title: {{ job['title'] }}</p>
+                    <p class="mb-0">Description: {{ job['description'] }}</p>
+                    <p class="mb-0">Spaces: {{ job['spaces'] }}</p>
+                    <p class="mb-0">Location: {{ job['location'] }}</p>
+                    <p class="mb-0">Company: {{ job['company'] }}</p>
+                    <p class="mb-0">Date: {{ job['date'] if job['date'] else 'TBA' }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Add your footer content here -->
+    </div>
+
+    <!-- Link to Bootstrap JS and jQuery (if needed) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
