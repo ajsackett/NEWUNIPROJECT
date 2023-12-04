@@ -14,11 +14,36 @@ login_manager.init_app(app)
 
 app.secret_key = 'fmweo9h094832htg'
 
+
+@app.route('/test-update')
+def test_update():
+    # Hardcoded test values
+    test_job_id = 12  # Replace with a valid job ID from your database
+    test_update_data = {
+        'title': 'Test Title2',
+        'description': 'Test Description',
+        'spaces': 10,
+        'location': 'Test Location',
+        'company': 'Test Company',
+        'date': datetime(2023, 1, 1)  # Example date, change as needed
+    }
+
+    # Call the update function
+    try:
+        update_job_in_db(test_job_id, test_update_data)
+        return 'Update successful'
+    except Exception as e:
+        return f'Update failed: {e}'
+    print(test_job_id)
+    print(test_update_data)
+
+
 class User(UserMixin):
     def __init__(self, id, username, role):
         self.id = id
         self.username = username
         self.role = role
+
 
 # Define a user loader function
 @login_manager.user_loader
@@ -30,28 +55,33 @@ def load_user(user_id):
         return user
     return None
 
+
 # A sample function to get user data by username and role
 def get_user_by_username(username):
     with engine.connect() as conn:
         result = conn.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username})
         return result.fetchone()
 
+
 def get_user_by_role(role):
     with engine.connect() as conn:
         result = conn.execute(text("SELECT * FROM users WHERE role = :role"), {"role": role})
         return result.fetchone()
 
-#admin dashboard
+
+# admin dashboard
 # Admin login page (GET request)
 @app.route('/admin/login', methods=['GET'])
 def admin_login():
     return render_template('admin_login.html')
+
 
 @app.route('/admin/logout')
 @login_required
 def admin_logout():
     logout_user()
     return 'Logged out successfully'
+
 
 # Admin login handling (POST request)
 @app.route('/admin/login', methods=['POST'])
@@ -78,6 +108,7 @@ def admin_login_post():
 def admin_dashboard():
     if request.method == 'POST':
         if request.form.get('action') == 'add':
+            print("Received form data:", request.form)
             # Handle job addition here (insert job data into the database)
             title = request.form.get('title')
             description = request.form.get('description')
@@ -104,9 +135,12 @@ def admin_dashboard():
                 'company': company,
                 'date': date
             }
+            print(job)
 
             # Call the add_job function
             add_job(job)
+            printy = add_job(job)
+            print(printy)
 
             # Redirect or return a success message
 
@@ -125,31 +159,65 @@ def admin_dashboard():
             # Redirect or return a success message
 
         elif request.form.get('action') == 'update':
-            job_name = request.form.get('job_name')
-            current_job = load_job_by_name(job_name)
+            job_id_str = request.form.get('job_id')
+            print("Received Job ID (string):", job_id_str)
+
+            # Safely convert job_id to int and handle potential errors
+            try:
+                job_id = int(job_id_str)
+                print("Converted Job ID (int):", job_id)
+            except ValueError:
+                print("Job ID conversion error. Received Job ID:", job_id_str)
+                return 'Invalid Job ID', 400
+
+            current_job = load_job_by_id(job_id)
             if not current_job:
+                print("Job not found for Job ID:", job_id)
                 return 'Job not found', 404
 
-            update_data = {}
-            for field in ['title', 'description', 'spaces', 'location', 'company', 'date']:
-                update_data[field] = request.form.get(field) if request.form.get(field) else current_job[field]
-
-            if update_data['date']:
+            update_data = {
+                'title': request.form.get('update_title'),
+                'description': request.form.get('update_description'),
+                'spaces': request.form.get('update_spaces'),
+                'location': request.form.get('update_location'),
+                'company': request.form.get('update_company'),
+                'date': request.form.get('update_date')
+            }
+            spaces_str = request.form.get('update_spaces')
+            if spaces_str:
                 try:
-                    update_data['date'] = datetime.strptime(update_data['date'], '%Y-%m-%d')
+                    update_data['spaces'] = int(spaces_str)
                 except ValueError:
-                    return 'Invalid date format. Please use YYYY-MM-DD format.', 400
+                    print("Invalid spaces value:", spaces_str)
+                    return 'Invalid spaces value. Please enter a number.', 400
+            else:
+                update_data['spaces'] = None
 
-            update_job_in_db(job_name, update_data)
-            return redirect('/admin/dashboard')
+
+            date_str = request.form.get('update_date')
+            if date_str:
+                try:
+                    update_data['date'] = datetime.strptime(date_str, '%Y-%m-%d')
+                except ValueError:
+                    print("Invalid date format:", date_str)
+                    return 'Invalid date format. Please use YYYY-MM-DD format.', 400
+            else:
+                update_data['date'] = None  # Or a default date, if appropriate
+
+            print("Update data:", update_data)
+
+            try:
+                update_job_in_db(job_id, update_data)
+                print("Update operation successful for Job ID:", job_id)
+            except Exception as e:
+                print("Error in updating job:", e)
+                return 'Error in updating job', 500
 
     jobs = load_all_jobs()
     return render_template('admin_dashboard.html', jobs=jobs)
 
 
-
-
-#user dashboard
+# user dashboard
 @app.route('/')
 def main():
     jobs = load_all_jobs()
@@ -185,10 +253,13 @@ def add_application(application):
 def add_job(job):
     with engine.connect() as conn:
         result = conn.execute(
-            text("INSERT INTO job_listings (title, description, spaces, location, company, date) VALUES (:title, :description, :spaces, :location, :company, :date)"),
-            {"title": job['title'], "description": job['description'], "spaces": job['spaces'], "location": job['location'], "company": job['company'], "date": job['date']}
+            text(
+                "INSERT INTO job_listings (title, description, spaces, location, company, date) VALUES (:title, :description, :spaces, :location, :company, :date)"),
+            {"title": job['title'], "description": job['description'], "spaces": job['spaces'],
+             "location": job['location'], "company": job['company'], "date": job['date']}
         )
         return result
+
 
 def remove_job(job):
     with engine.connect() as conn:
@@ -204,10 +275,12 @@ def get_user_by_username(username):
         result = conn.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username})
         return result.fetchone()
 
+
 def get_user_by_role(role):
     with engine.connect() as conn:
         result = conn.execute(text("SELECT * FROM users WHERE role = :role"), {"role": role})
         return result.fetchone()
+
 
 def get_user_by_id(id):
     with engine.connect() as conn:
@@ -221,12 +294,20 @@ def load_job_by_name(job_name):
         row = result.fetchone()
         return row._asdict() if row else None
 
-def update_job_in_db(job_name, update_data):
+
+def update_job_in_db(job_id, update_data):
     with engine.connect() as conn:
-        conn.execute(
-            text("UPDATE job_listings SET title=:title, description=:description, spaces=:spaces, location=:location, company=:company, date=:date WHERE title = :original_title"),
-            {**update_data, "original_title": job_name}
-        )
+        try:
+            conn.execute(
+                text(
+                    "UPDATE job_listings SET title=:title, description=:description, spaces=:spaces, location=:location, company=:company, date=:date WHERE id = :job_id"),
+                {**update_data, "job_id": job_id}
+            )
+            conn.commit()
+        except Exception as e:
+            print("SQL Error:", e)
+            conn.rollback()
+
 
 @app.route('/api/jobs')
 def list_jobs():
@@ -258,14 +339,6 @@ def apply_for_job(id):
 
     # For demonstration, return a success message
     return render_template('applicationsubmitted.html', name=name, email=email)
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
