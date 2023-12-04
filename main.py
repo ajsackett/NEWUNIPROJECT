@@ -124,6 +124,25 @@ def admin_dashboard():
 
             # Redirect or return a success message
 
+        elif request.form.get('action') == 'update':
+            job_name = request.form.get('job_name')
+            current_job = load_job_by_name(job_name)
+            if not current_job:
+                return 'Job not found', 404
+
+            update_data = {}
+            for field in ['title', 'description', 'spaces', 'location', 'company', 'date']:
+                update_data[field] = request.form.get(field) if request.form.get(field) else current_job[field]
+
+            if update_data['date']:
+                try:
+                    update_data['date'] = datetime.strptime(update_data['date'], '%Y-%m-%d')
+                except ValueError:
+                    return 'Invalid date format. Please use YYYY-MM-DD format.', 400
+
+            update_job_in_db(job_name, update_data)
+            return redirect('/admin/dashboard')
+
     jobs = load_all_jobs()
     return render_template('admin_dashboard.html', jobs=jobs)
 
@@ -195,6 +214,20 @@ def get_user_by_id(id):
         result = conn.execute(text("SELECT * FROM users WHERE id = :id"), {"id": id})
         return result.fetchone()
 
+
+def load_job_by_name(job_name):
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM job_listings WHERE title = :title"), {"title": job_name})
+        row = result.fetchone()
+        return row._asdict() if row else None
+
+def update_job_in_db(job_name, update_data):
+    with engine.connect() as conn:
+        conn.execute(
+            text("UPDATE job_listings SET title=:title, description=:description, spaces=:spaces, location=:location, company=:company, date=:date WHERE title = :original_title"),
+            {**update_data, "original_title": job_name}
+        )
+
 @app.route('/api/jobs')
 def list_jobs():
     jobs = load_all_jobs()
@@ -237,5 +270,3 @@ def apply_for_job(id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
-
-
