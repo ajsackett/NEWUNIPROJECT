@@ -8,6 +8,7 @@ from flask_login import login_user, current_user
 from flask import redirect, url_for
 from datetime import datetime
 
+
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -144,77 +145,61 @@ def admin_dashboard():
 
             # Redirect or return a success message
 
-        elif request.form.get('action') == 'remove':
-            # Handle job removal here (delete job from the database)
-            title_to_remove = request.form.get('title_to_remove')
+        elif request.form.get('action') == 'update':
+            job_id_str = request.form.get('job_id')
+            print("Received Job ID (string):", job_id_str)
 
-            # Create a job dictionary for removal
-            job_to_remove = {
-                'title': title_to_remove
-            }
+            # Safely convert job_id to int and handle potential errors
+            try:
+                job_id = int(job_id_str)
+                print("Converted Job ID (int):", job_id)
+            except ValueError:
+                print("Job ID conversion error. Received Job ID:", job_id_str)
+                return 'Invalid Job ID', 400
 
-            # Call the remove_job function
-            remove_job(job_to_remove)
+            current_job = load_job_by_id(job_id)
+            if not current_job:
+                print("Job not found for Job ID:", job_id)
+                return 'Job not found', 404
 
-            # Redirect or return a success message
+            # Initialize update_data with current job data
+            update_data = current_job.copy()
 
-       elif request.form.get('action') == 'update':
-    job_id_str = request.form.get('job_id')
-    print("Received Job ID (string):", job_id_str)
+            # Update fields if new data is provided
+            for field in ['title', 'description', 'location', 'company']:
+                new_value = request.form.get(f'update_{field}')
+                if new_value:
+                    update_data[field] = new_value
 
-    # Safely convert job_id to int and handle potential errors
-    try:
-        job_id = int(job_id_str)
-        print("Converted Job ID (int):", job_id)
-    except ValueError:
-        print("Job ID conversion error. Received Job ID:", job_id_str)
-        return 'Invalid Job ID', 400
+            # Handle 'spaces' field
+            spaces_str = request.form.get('update_spaces')
+            if spaces_str:
+                try:
+                    update_data['spaces'] = int(spaces_str)
+                except ValueError:
+                    print("Invalid spaces value:", spaces_str)
+                    return 'Invalid spaces value. Please enter a number.', 400
 
-    current_job = load_job_by_id(job_id)
-    if not current_job:
-        print("Job not found for Job ID:", job_id)
-        return 'Job not found', 404
+            # Handle 'date' field
+            date_str = request.form.get('update_date')
+            if date_str:
+                try:
+                    update_data['date'] = datetime.strptime(date_str, '%Y-%m-%d')
+                except ValueError:
+                    print("Invalid date format:", date_str)
+                    return 'Invalid date format. Please use YYYY-MM-DD format.', 400
 
-    # Initialize update_data with current job data
-    update_data = current_job.copy()
+            print("Update data:", update_data)
 
-    # Only update fields if new data is provided
-    for field in ['title', 'description', 'location', 'company']:
-        new_value = request.form.get(f'update_{field}')
-        if new_value is not None:
-            update_data[field] = new_value
-
-    # Handle 'spaces' field separately due to type conversion
-    spaces_str = request.form.get('update_spaces')
-    if spaces_str:
-        try:
-            update_data['spaces'] = int(spaces_str)
-        except ValueError:
-            print("Invalid spaces value:", spaces_str)
-            return 'Invalid spaces value. Please enter a number.', 400
-
-    # Handle 'date' field separately due to type conversion
-    date_str = request.form.get('update_date')
-    if date_str:
-        try:
-            update_data['date'] = datetime.strptime(date_str, '%Y-%m-%d')
-        except ValueError:
-            print("Invalid date format:", date_str)
-            return 'Invalid date format. Please use YYYY-MM-DD format.', 400
-
-    print("Update data:", update_data)
-
-    try:
-        update_job_in_db(job_id, update_data)
-        print("Update operation successful for Job ID:", job_id)
-    except Exception as e:
-        print("Error in updating job:", e)
-        return 'Error in updating job', 500
+            try:
+                update_job_in_db(job_id, update_data)
+                print("Update operation successful for Job ID:", job_id)
+            except Exception as e:
+                print("Error in updating job:", e)
+                return 'Error in updating job', 500
 
     jobs = load_all_jobs()
     return render_template('admin_dashboard.html', jobs=jobs)
-
-
 # user dashboard
 @app.route('/')
 def main():
@@ -342,3 +327,4 @@ def apply_for_job(id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
+
