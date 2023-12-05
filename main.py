@@ -145,6 +145,30 @@ def admin_dashboard():
 
             # Redirect or return a success message
 
+        elif request.form.get('action') == 'remove':
+            print("Received form data:", request.form)
+            # Retrieve the job ID from the form input
+            job_id_str = request.form.get('job_id_to_remove')
+            print("Received Job ID to remove (string):", job_id_str)
+
+            # Convert job_id_str to an integer and handle potential errors
+            try:
+                job_id = int(job_id_str)
+                print("Converted Job ID to remove (int):", job_id)
+            except ValueError:
+                print("Error in converting Job ID to remove. Received:", job_id_str)
+                return 'Invalid Job ID', 400
+
+            # Remove the job using its ID
+            try:
+                remove_job(job_id)
+                print("Job successfully removed with ID:", job_id)
+            except Exception as e:
+                print("Error in removing job:", e)
+                return 'Error in removing job', 500
+
+            # Redirect or return a success message
+
         elif request.form.get('action') == 'update':
             job_id_str = request.form.get('job_id')
             print("Received Job ID (string):", job_id_str)
@@ -245,13 +269,14 @@ def add_job(job):
         return result
 
 
-def remove_job(job):
+def remove_job(job_id):
     with engine.connect() as conn:
         result = conn.execute(
-            text("DELETE FROM job_listings WHERE title = :title"),
-            {"title": job['title']}
+            text("DELETE FROM job_listings WHERE id = :job_id"),
+            {"job_id": job_id}
         )
         return result
+
 
 
 def get_user_by_username(username):
