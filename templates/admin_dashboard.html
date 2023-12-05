@@ -126,6 +126,7 @@
         <ul class="list-group">
             {% for job in jobs %}
                 <li class="list-group-item">
+                    <p class="mb-0">Job_id: {{ job['id'] }}</p>
                     <p class="mb-0">Title: {{ job['title'] }}</p>
                     <p class="mb-0">Description: {{ job['description'] }}</p>
                     <p class="mb-0">Spaces: {{ job['spaces'] }}</p>
