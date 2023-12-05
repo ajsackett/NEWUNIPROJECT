@@ -216,12 +216,13 @@ def admin_dashboard():
     jobs = load_all_jobs()
     return render_template('admin_dashboard.html', jobs=jobs)
 
-
+def hello()
 # user dashboard
 @app.route('/')
 def main():
     jobs = load_all_jobs()
     return render_template('home.html', jobs=jobs)
+
 
 
 def load_all_jobs():
