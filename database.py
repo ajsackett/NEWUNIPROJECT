@@ -14,7 +14,7 @@ def create_db_engine():
         url=url,
         connect_args={
             'ssl': {
-                'ca': r'C:/Users/t600d/Downloads/cacert.pem' # Use 'r' for raw string
+                'ca': r'cacert.pem' # Use 'r' for raw string
                 # Add other SSL options if needed, such as 'cert' and 'key'
             }
         }
