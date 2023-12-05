@@ -108,18 +108,20 @@
 <!-- ... existing content ... -->
 
 
-        <!-- Form for Removing a Job by Title -->
-        <h2 class="mt-4">Remove a Job</h2>
-        <form method="POST" action="/admin/dashboard">
-            <input type="hidden" name="action" value="remove">  <!-- Action identifier -->
-            <div class="form-group">
-                <label for="title_to_remove">Title to Remove:</label>
-                <input type="text" name="title_to_remove" id="title_to_remove" required class="form-control">
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Remove Job" class="btn btn-danger">
-            </div>
-        </form>
+
+       <!-- Form for Removing a Job by ID -->
+<h2 class="mt-4">Remove a Job</h2>
+<form method="POST" action="/admin/dashboard">
+    <input type="hidden" name="action" value="remove">  <!-- Action identifier -->
+    <div class="form-group">
+        <label for="job_id_to_remove">Job ID to Remove:</label>
+        <input type="text" name="job_id_to_remove" id="job_id_to_remove" required class="form-control">
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Remove Job" class="btn btn-danger">
+    </div>
+</form>
+
 
         <!-- Display List of Jobs (you can loop through jobs and display them here) -->
         <h2 class="mt-4">List of Jobs</h2>
@@ -146,4 +148,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
+
 
